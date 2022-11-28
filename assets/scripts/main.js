@@ -6,6 +6,7 @@ let search=document.getElementById("search");
 let count =0;
 let tasks=[];
 let remove=false;
+let id=null;
 displayTasks();
 if(localStorage.getItem("alldata")!=null){
     tasks = JSON.parse(localStorage.getItem("alldata"));
@@ -59,11 +60,15 @@ function displayTasks(){
     <li>
     <p>${task.toDo} </p>
     <button onclick="handleCompletion()" class="complete"><i class="far fa-check-circle"></i></button> <button
-            class="delete" onclick="deleteInput(${i})"><i class="fas fa-trash-alt"></i></button>
+            class="delete" onclick="setId(${i})"><i class="fas fa-trash-alt"></i></button>
 </li>`);
 toDos.innerHTML=result;
 }
-function deleteInput(id){
+function setId(i){
+    id=i
+    deleteInput()
+}
+function deleteInput(){
     toggleConfirm();
     if(remove){
     search.value=''
@@ -87,7 +92,7 @@ function searchTasks(){
             <li>
             <p>${task.toDo} </p>
             <button onclick="handleCompletion()" class="complete"><i class="far fa-check-circle"></i></button> <button
-                    class="delete"  onclick="deleteInput(${i})"><i class="fas fa-trash-alt"></i></button>
+                    class="delete"  onclick="setId(${i})"><i class="fas fa-trash-alt"></i></button>
         </li>`
     }});
     toDos.innerHTML=result;
