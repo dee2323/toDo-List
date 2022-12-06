@@ -133,9 +133,16 @@ input {
     text-decoration: line-through;
 }
 
-.count-tasks {
+.count-tasks,
+.completed-tasks {
     color: rgb(214, 133, 146);
     text-align: center;
+}
+
+.counter-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
 }
 
 .overlay {

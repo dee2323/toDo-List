@@ -2,11 +2,13 @@ const task=document.querySelector('.task');
 const add=document.querySelector('.add')
 const toDos=document.querySelector('.todos')
 const counter=document.querySelector('.count-tasks')
+const counterCompletedTasks=document.querySelector('.completed-tasks')
 let search=document.getElementById("search");
 let count =0;
 let tasks=[];
 let remove=false;
 let id=null;
+let countCompleted=0;
 displayTasks();
 if(localStorage.getItem("alldata")!=null){
     tasks = JSON.parse(localStorage.getItem("alldata"));
@@ -33,13 +35,30 @@ function handleAddition(e){
     if(toDo){
         count++;
         setTaskCounter();
-        tasks.push({id:count,toDo});
+        tasks.push({id:count,toDo,isCompleted:false});
         localStorage.setItem("alldata",JSON.stringify(tasks));
     }
     clearInput();
     displayTasks()
 }
-function handleCompletion(){
+function setCompletedTaskNo(){
+    countCompleted=0;
+    tasks.map(task=>{
+        if(task.isCompleted===true)
+        countCompleted++
+    })
+}
+
+function handleCompletion(i){
+    
+    tasks.find(item=>{
+       if(item.id===i+1){
+        item.isCompleted=!item.isCompleted;
+        localStorage.setItem("alldata",JSON.stringify(tasks));
+       }
+    })
+    setCompletedTaskNo();
+    setTaskCounter();
     toDos.onclick = function(event) {  
         let btn;
         btn = event.target.closest('.complete');
@@ -48,20 +67,29 @@ function handleCompletion(){
         }
     }
 }
+
 function setTaskCounter(){
-    counter.innerHTML=`You have ${count} pending tasks.`
+    counter.innerHTML=`Tasks ${count}`
+    setCompletedTaskNo();
+    counterCompletedTasks.innerHTML=`Completed Tasks ${countCompleted}`
 }
 function toggleConfirm(){
         document.getElementById('overlay').classList.toggle('display');
 }
 function displayTasks(){
+   
     let result='';
-    tasks.map((task,i)=> result+=`
+    tasks.map((task,i)=> {
+        let c=task.isCompleted?'complete':'';
+        setTaskCounter();
+
+    result+=`
     <li>
-    <p>${task.toDo} </p>
-    <button onclick="handleCompletion()" class="complete"><i class="far fa-check-circle"></i></button> <button
+    
+    <p class='${c}'>${task.toDo} </p>
+    <button onclick='handleCompletion(${i})' class="complete"><i class="far fa-check-circle"></i></button> <button
             class="delete" onclick="setId(${i})"><i class="fas fa-trash-alt"></i></button>
-</li>`);
+</li>`});
 toDos.innerHTML=result;
 }
 function setId(i){
@@ -91,7 +119,7 @@ function searchTasks(){
             result+=`
             <li>
             <p>${task.toDo} </p>
-            <button onclick="handleCompletion()" class="complete"><i class="far fa-check-circle"></i></button> <button
+            <button onclick='handleCompletion(${i})' class="complete"><i class="far fa-check-circle"></i></button> <button
                     class="delete"  onclick="setId(${i})"><i class="fas fa-trash-alt"></i></button>
         </li>`
     }});
