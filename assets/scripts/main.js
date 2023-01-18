@@ -6,16 +6,16 @@ const counterCompletedTasks = document.querySelector('.completed-tasks')
 let search = document.getElementById("search");
 let tasks = [];
 let remove = false;
+let isSearching = false;
 displayTasks();
 if (localStorage.getItem("alldata") != null) {
     tasks = JSON.parse(localStorage.getItem("alldata"));
     count = tasks.length;
-    // setTaskCounter()
     displayTasks();
 }
 /*********************/
 add.addEventListener('click', handleAddition);
-search.addEventListener('keyup', searchTasks)
+search.addEventListener('keyup', displayTasks)
 document.getElementById('confirmDeleting').addEventListener('click', () => {
     remove = true;
     toggleConfirm();
@@ -32,9 +32,22 @@ function toggleConfirm() {
     document.getElementById('overlay').classList.toggle('display');
 }
 function displayTasks() {
+    let searchValue = search.value;
     setTaskCounter()
     let result = '';
-    tasks.map((task) => {
+
+    search.value ? tasks.map((task) => {
+        if (task.toDo.toLowerCase().includes(searchValue.toLowerCase())) {
+            setTaskCounter()
+            let c = task.isCompleted ? 'complete' : '';
+            result += `
+    <li>
+    <p class='${c}'>${task.toDo} </p>
+    <button  id=${task.id} class="complete"><i class="far fa-check-circle"></i></button> 
+    <button id=${task.id} class="delete" onclick=""><i class="fas fa-trash-alt"></i></button>
+</li>`
+        }
+    }) : tasks.map((task) => {
         let c = task.isCompleted ? 'complete' : '';
         result += `
     <li>
@@ -52,7 +65,7 @@ function handleAddition(e) {
         saveNewData()
     }
     clearInput();
-    displayTasks();
+    displayTasks()
 }
 function setCompletedTaskNo() {
     countCompleted = 0;
@@ -65,7 +78,6 @@ let id = '';
 toDos.onclick = function (event) {
     id = String(event.target.parentElement.id);
     if (event.target.classList[1].includes('check')) {
-        console.log(event.target.parentElement.id)
         tasks.find(item => {
             if (item.id === id) {
                 item.isCompleted = !item.isCompleted;
@@ -73,10 +85,8 @@ toDos.onclick = function (event) {
         })
     }
     else if (event.target.classList[1].includes('trash')) {
-        console.log(id)
         toggleConfirm();
     }
-    console.log(tasks)
     saveNewData()
     displayTasks();
 }
@@ -89,24 +99,6 @@ function removeComfirm() {
 function clearInput() {
     task.value = "";
 }
-function searchTasks() {
-    let searchValue = search.value;
-    let result = ``;
-    tasks.map((task) => {
-        if (task.toDo.toLowerCase().includes(searchValue.toLowerCase())) {
-            setTaskCounter()
-            let c = task.isCompleted ? 'complete' : '';
-            result += `
-    <li>
-    <p class='${c}'>${task.toDo} </p>
-    <button  id=${task.id} class="complete"><i class="far fa-check-circle"></i></button> 
-    <button id=${task.id} class="delete" onclick=""><i class="fas fa-trash-alt"></i></button>
-</li>`
-        }
-    });
-    toDos.innerHTML = result;
-}
 function saveNewData() {
     localStorage.setItem("alldata", JSON.stringify(tasks));
-    console.log(localStorage.getItem('alldata'));
 }
